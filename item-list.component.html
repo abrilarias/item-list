@@ -1,0 +1,54 @@
+<ion-content>
+  <h1>Item List</h1>
+  <mat-slide-toggle [(ngModel)]="isChecked">Details</mat-slide-toggle>
+  <mat-card class="noItems" *ngIf="this.itemList.length === 0">
+    <p>No items</p>
+  </mat-card>
+  <div *ngFor="let group of this.itemGroups; index as i">
+    <mat-accordion multi="true" >
+      <h3 >{{groupNames[i]}} </h3>
+      <div class="example-action-buttons">
+        <button mat-button (click)="accordion.openAll()">Expand All</button>
+        <button mat-button (click)="accordion.closeAll()">Collapse All</button>
+      </div>
+      <mat-expansion-panel *ngFor="let item of group">
+        <mat-expansion-panel-header>
+          <div>
+            <mat-panel-title font-size=large>
+              <a [routerLink]="['/projects/' + this.id + '/items/' + item.id]"><mat-icon *ngIf="item.childLevel > 0">subdirectory_arrow_right</mat-icon>{{item.title}} (#{{item.id}})</a>
+            </mat-panel-title>
+            <mat-panel-description *ngIf="item.inventoryType !== 'PRODUCT'"> {{item.inventoryType}}</mat-panel-description>
+            <mat-panel-description>QTY: {{item.quantity}}</mat-panel-description>
+          </div>
+          <div *ngIf="isChecked">
+            <mat-panel-description>Category: {{item.subCategory}}</mat-panel-description>
+            <mat-panel-description  *ngFor="let attributeName of item.attributeNames; index as j;">{{attributeName}}: {{item.attributeValues[j]}}</mat-panel-description>
+          </div>
+        </mat-expansion-panel-header>
+
+        <section class="section" *ngIf="item.inventoryType === 'PRODUCT' || item.inventoryType === 'SERVICE'">
+          <span>
+            <div>
+              <mat-checkbox class="margin" class="custom-frame" [(ngModel)]="item.pullSheet.stages[0].completed" (ngModelChange)="updateTwoComplete(item.pullSheet, item)" (ngModelChange)="updateAllComplete(item.pullSheet, item)"  ></mat-checkbox>
+              <p>{{item.pullSheet.stages[0].name}}</p>
+            </div>
+          </span>
+          <span>
+            <div>
+              <mat-checkbox class="margin" class="custom-frame" [(ngModel)]="item.pullSheet.stages[1].completed" (ngModelChange)="updateTwoComplete(item.pullSheet, item)" (ngModelChange)="updateAllComplete(item.pullSheet, item)"  (change)="setTwo($event.checked, item.pullSheet, item)" [checked]="item.pullSheet.twoComplete"></mat-checkbox>
+              <p>{{item.pullSheet.stages[1].name}}</p>
+            </div>
+          </span>
+          <span>
+            <div>
+              <mat-checkbox class="margin" class="custom-frame" [(ngModel)]="item.pullSheet.stages[2].completed" (ngModelChange)="updateAllComplete(item.pullSheet, item)" (change)="setAll($event.checked, item.pullSheet, item)" [checked]="item.pullSheet.allComplete" ></mat-checkbox>
+              <p>{{item.pullSheet.stages[2].name}}</p>
+            </div>
+          </span>
+        </section>
+
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+</ion-content>
